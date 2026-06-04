@@ -9,7 +9,13 @@ struct AppleWatchPetApp: App {
             DecorItem.self,
             PetTask.self,
         ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        
+        // 显式启用 CloudKit 配置
+        let modelConfiguration = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: false,
+            cloudKitDatabase: .private("iCloud.com.neveevol7.PetWatch")
+        )
 
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
