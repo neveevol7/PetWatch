@@ -53,6 +53,8 @@ struct TaskListView: View {
             pet.hunger = min(100, pet.hunger + task.hungerReward)
             // 奖励少量金币
             pet.coins += 10
+            // 奖励经验值
+            StatusManager.shared.gainExp(20, for: pet)
         }
     }
 }

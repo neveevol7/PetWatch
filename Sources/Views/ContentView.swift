@@ -25,7 +25,11 @@ struct ContentView: View {
             }
             .onAppear {
                 healthKit.requestAuthorization { _, _ in
-                    healthKit.fetchTodaySteps { _ in }
+                    healthKit.fetchTodaySteps { steps in
+                        if let pet = pets.first {
+                            StatusManager.shared.syncSteps(for: pet, currentTotalSteps: Int(steps))
+                        }
+                    }
                 }
                 if let pet = pets.first {
                     StatusManager.shared.updateStatus(for: pet, isCharging: deviceStatus.isCharging)
@@ -34,7 +38,9 @@ struct ContentView: View {
             .onReceive(timer) { _ in
                 if let pet = pets.first {
                     StatusManager.shared.updateStatus(for: pet, isCharging: deviceStatus.isCharging)
-                    healthKit.fetchTodaySteps { _ in }
+                    healthKit.fetchTodaySteps { steps in
+                        StatusManager.shared.syncSteps(for: pet, currentTotalSteps: Int(steps))
+                    }
                 }
             }
             .navigationTitle("PetWatch")
