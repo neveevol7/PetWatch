@@ -57,57 +57,65 @@ struct PetMainView: View {
     let pet: Pet
     
     var body: some View {
-        VStack(spacing: 4) {
-            // 顶部等级与金币
+        VStack(spacing: 0) {
+            // 顶部状态栏 (仿宝可梦样式)
             HStack {
-                Text("⭐ LV.\(pet.level)")
+                Text("Lv\(pet.level) \(pet.name)")
+                    .font(.system(size: 12, weight: .bold, design: .monospaced))
                 Spacer()
                 Text("💰 \(pet.coins)")
+                    .font(.system(size: 12, weight: .bold, design: .monospaced))
             }
-            .font(.system(size: 10, weight: .bold))
-            .padding(.horizontal)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(PixelTheme.background)
+            .foregroundColor(PixelTheme.border)
+            .border(PixelTheme.border, width: 1)
             
-            // 宠物展示区
+            // 核心显示区：分层背景 + 动态宠物
             ZStack {
-                // 背景场景 (如果有)
-                Circle()
-                    .fill(Color.gray.opacity(0.1))
-                    .frame(width: 70, height: 70)
+                EnvironmentBackgroundView(backgroundEmoji: pet.inventory.first(where: { $0.category == .background })?.emoji)
                 
-                // 宠物本体
-                Text(pet.hunger > 10 ? "🐱" : "😿")
-                    .font(.system(size: 40))
-                    .grayscale(pet.hunger > 10 ? 0 : 0.8)
-                
-                // 佩戴的第一个饰品预览
-                if let firstDecor = pet.inventory.first(where: { $0.category == .hat }) {
-                    Text(firstDecor.emoji)
-                        .font(.system(size: 20))
-                        .offset(y: -25)
-                }
+                PetSpriteView(
+                    petEmoji: "🐱",
+                    isFamine: pet.isFamine,
+                    hatEmoji: pet.inventory.first(where: { $0.category == .hat })?.emoji
+                )
+                .offset(y: 10)
             }
+            .frame(maxHeight: .infinity)
             
-            // RPG 属性条
-            VStack(spacing: 2) {
-                StatusProgressView(label: "饥饿", value: pet.hunger, color: .green)
-                StatusProgressView(label: "心情", value: pet.mood, color: .red)
-                StatusProgressView(label: "精力", value: pet.stamina, color: .blue)
+            // 底部属性面板
+            VStack(spacing: 4) {
+                PixelProgressBar(label: "HP", value: pet.hunger, color: PixelTheme.green)
+                PixelProgressBar(label: "心情", value: pet.mood, color: PixelTheme.blue)
+                PixelProgressBar(label: "精力", value: pet.stamina, color: PixelTheme.red)
             }
-            .padding(.horizontal)
+            .padding(8)
+            .background(PixelTheme.background)
+            .border(PixelTheme.border, width: 2)
             
-            // 底部导航
-            HStack(spacing: 10) {
+            // 导航按钮
+            HStack(spacing: 12) {
                 NavigationLink(destination: TaskListView()) {
-                    Image(systemName: "checklist")
+                    Text("任务").font(.system(size: 10))
                 }
                 NavigationLink(destination: StoreView()) {
-                    Image(systemName: "cart.fill")
+                    Text("商店").font(.system(size: 10))
+                }
+                // 排行榜入口 (待实现)
+                Button(action: {}) {
+                    Text("排行").font(.system(size: 10))
                 }
             }
             .buttonStyle(.bordered)
             .controlSize(.mini)
-            .padding(.top, 4)
+            .padding(.vertical, 4)
+            .background(Color.black.opacity(0.1))
         }
+        .background(Color.white)
+        .cornerRadius(12)
+        .padding(2)
     }
 }
 
